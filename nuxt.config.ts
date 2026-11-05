@@ -1,8 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxt/ui', '@nuxt/eslint', '@nuxtjs/mdc'],
+  modules: ['@nuxt/eslint'],
   devtools: { enabled: true },
-  css: ['~/assets/css/main.css'],
   runtimeConfig: {
     openaiApiKey: '',
   },
@@ -16,9 +15,4 @@ export default defineNuxtConfig({
       },
     },
   },
-  // vite: {
-  //   optimizeDeps: {
-  //     include: ['debug'],
-  //   }
-  // }
 });
