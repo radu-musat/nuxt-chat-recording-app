@@ -1,9 +1,21 @@
-import { createChat } from '#layers/chat/server/repository/chatRepository.ts';
+import { createChat } from '../../repository/chatRepository';
+import { CreateChatSchema } from '../../schemas';
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  console.log(body);
-  const { title, projectId } = body;
+  const { success, data } = await readValidatedBody(
+    event,
+    CreateChatSchema.safeParse,
+  );
+
+  if (!success) {
+    return 400;
+  }
+
+  const { title, projectId } = data;
+
+  const storage = useStorage('db');
+  await storage.setItem('chats:has-new-chat', true);
+
   return createChat({
     title,
     projectId,

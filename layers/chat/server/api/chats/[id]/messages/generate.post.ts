@@ -1,8 +1,15 @@
-import { getMessagesByChatId, createMessageForChat } from '#layers/chat/server/repository/chatRepository.ts';
-import { createOpenAIModel, generateChatResponse } from '#layers/chat/server/services/ai-service.ts';
+import {
+  getMessagesByChatId,
+  createMessageForChat,
+} from '../../../../repository/chatRepository';
+import {
+  createOpenAIModel,
+  generateChatResponse,
+} from '../../../../services/ai-service';
 
 export default defineEventHandler(async (event) => {
   const { id } = getRouterParams(event);
+
   if (!id) {
     throw createError({
       statusCode: 400,
@@ -10,16 +17,17 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const history = getMessagesByChatId(id);
+  const history = await getMessagesByChatId(id);
+
   const openai = createOpenAIModel(
     useRuntimeConfig().openaiApiKey,
   );
-
   const reply = await generateChatResponse(openai, history);
+
   if (!reply) {
     throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to generate chat reply',
+      statusCode: 400,
+      statusMessage: 'No ai reply available',
     });
   }
 

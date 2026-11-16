@@ -1,10 +1,23 @@
-import { createOpenAIModel, generateChatResponse } from '#layers/chat/server/services/ai-service.ts';
+import {
+  createOpenAIModel,
+  generateChatResponse,
+} from '../services/ai-service';
+import { ChatMessageSchema } from '../schemas';
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const { messages } = body;
+  const { success, data } = await readValidatedBody(
+    event,
+    ChatMessageSchema.safeParse,
+  );
 
-  const id = messages.length.toString();
+  if (!success) {
+    return 400;
+  }
+
+  const { messages } = data as {
+    messages: ChatMessage[];
+    chatId: string;
+  };
 
   const openaiApiKey = useRuntimeConfig().openaiApiKey;
   const openaiModel = createOpenAIModel(openaiApiKey);
@@ -15,7 +28,7 @@ export default defineEventHandler(async (event) => {
   );
 
   return {
-    id,
+    id: messages.length.toString(),
     role: 'assistant',
     content: response,
   };

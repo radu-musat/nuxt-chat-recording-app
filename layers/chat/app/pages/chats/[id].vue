@@ -6,7 +6,10 @@ const {
   chat: chatFromChats,
   messages,
   sendMessage,
+  fetchMessages,
 } = useChat(route.params.id as string);
+
+await fetchMessages();
 
 if (!chatFromChats.value) {
   await navigateTo('/', { replace: true });

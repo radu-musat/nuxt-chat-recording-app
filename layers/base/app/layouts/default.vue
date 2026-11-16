@@ -9,7 +9,7 @@ const isSidebarOpen = ref(true);
     />
     <AppSidebar :is-open="isSidebarOpen" />
     <main
-      class="main-content transition-all duration-300 ease-in-out"
+      class="main-content transition-all duration-300 flex ease-in-out"
       :class="{
         'ml-64': isSidebarOpen,
       }"

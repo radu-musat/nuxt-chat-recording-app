@@ -1,5 +1,22 @@
-import { getAllChats } from '#layers/chat/server/repository/chatRepository.ts';
+import { getAllChats } from '../../repository/chatRepository';
 
-export default defineEventHandler(async (_event): Promise<Chat[]> => {
-  return getAllChats();
-});
+export default defineCachedEventHandler(
+  async (_event) => {
+    const storage = useStorage('db');
+    await storage.setItem('chats:has-new-chat', false);
+
+    return getAllChats();
+  },
+  {
+    name: 'getAllChats',
+    maxAge: 0,
+    swr: false, // staleWhileRevalidate
+    async shouldInvalidateCache() {
+      const storage = useStorage('db');
+      const hasNewChat = await storage.getItem<boolean>(
+        'chats:has-new-chat',
+      );
+      return hasNewChat || false;
+    },
+  },
+);

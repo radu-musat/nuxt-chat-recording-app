@@ -1,4 +1,4 @@
-import { generateText } from 'ai';
+import { generateText, streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import type { Message, LanguageModelV1 } from 'ai';
 
@@ -38,7 +38,8 @@ export async function generateChatTitle(
       {
         role: 'system',
         content:
-            'Summarize the message in 3 or less short words.',
+            `You are a helpful assistant that generates concise, descriptive titles for chat conversations. 
+            Generate a title that captures the essence of the first message in 3 short words or less.`,
       },
       {
         role: 'user',
@@ -47,4 +48,14 @@ export async function generateChatTitle(
     ],
   });
   return response.text.trim();
+}
+
+export async function streamChatResponse(model: LanguageModelV1, messages: Message[]) {
+  if (!Array.isArray(messages) || messages.length === 0) {
+    throw new Error('Invalid messages format');
+  }
+  return streamText({
+    model,
+    messages,
+  }).textStream;
 }
